@@ -17,7 +17,7 @@ export const Header = ({
             </Button>
         </Link>
         <h1 className="font-bold text-lg">
-            Spanish
+            {title}
         </h1>
         <div/>
     </div>
