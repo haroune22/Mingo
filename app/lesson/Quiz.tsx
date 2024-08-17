@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Header } from "./Header";
 
 
+
+
 type Props = {
     initialPercentage: number;
     initialHearts: number;
