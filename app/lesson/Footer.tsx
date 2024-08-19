@@ -59,7 +59,7 @@ export const Footer = ({
                 {status === "none" && "Check"}
                 {status === "correct" && "Next"}
                 {status === "wrong" && "Retry"}
-                {status === "completed" && "Continu"}
+                {status === "completed" && "Continue"}
             </Button>
         </div>
     </footer>

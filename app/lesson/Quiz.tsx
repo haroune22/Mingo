@@ -1,11 +1,14 @@
 "use client"
 
 import { challengeOptions, challenges } from "@/db/schema";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Header } from "./Header";
 import { QuestionBubble } from "./QuestionBubble";
 import { Challenge } from "./Challenge";
 import { Footer } from "./Footer";
+import { upserChallengeProgress } from "@/actions/challenge_progress";
+import { toast } from "sonner";
+import { reduceHearts } from "@/actions/user-progress";
 
 
 
@@ -30,6 +33,8 @@ export const Quiz = ({
     userSubscription,
 }:Props) => {
 
+    const [pending, startTransition] = useTransition()
+
     const [hearts, setHearts] = useState(initialHearts);
     const [percentage, setPercentage] = useState(initialPercentage);
     const [challenges] = useState(initialLessonChallenges);
@@ -43,13 +48,77 @@ export const Quiz = ({
 
     const challenge = challenges[activeIndex]
     const Options = challenge.challengeOptions;
-    
+
+    const onNext = () => {
+        setActiveIndex((current) => current + 1)
+    }
 
     const onSelect = (id:number) => {
         if(status !== "none") return;
 
         setSelectedOption(id)
 
+    };
+
+    const onContinue = () => {
+        if(!selectedOption) return ;
+        // console.log(selectedOption);
+
+        if(status === "wrong"){
+            setStatus("none")
+            setSelectedOption(undefined)
+            return;
+        };
+
+        if(status === "correct"){
+            onNext()
+            setStatus("none")
+            setSelectedOption(undefined)
+            return
+        };
+
+        const correctOption = Options.find((option) => option.correct);
+        // console.log(correctOption)
+        if(!correctOption){
+            return
+        };
+
+        if(correctOption.id === selectedOption){
+            startTransition(()=> {
+                upserChallengeProgress(challenge.id)
+                .then((res) => {
+                    if(res?.error === 'hearts'){
+                        console.log("Missing hearts")
+                        return
+                    }
+
+                    setStatus("correct")
+                    setPercentage((prev) => prev + 100 / challenges.length)
+
+                    if(initialPercentage === 100){
+                        setHearts((prev)=> Math.min(prev + 1, 5))
+                    }
+                })
+                .catch(()=> toast.error("Somthing went wrong. Please try again"))
+            })
+        } else {
+            startTransition(()=> {
+                reduceHearts(challenge.id)
+                .then((res) => {
+                    if(res?.error === 'hearts'){
+                        console.log("Missing hearts")
+                        return
+                    }
+
+                    setStatus("wrong")
+
+                    if(!res?.error){
+                        setHearts((prev)=> Math.max(prev - 1, 0))
+                    }
+                })
+                .catch(()=> toast.error("Somthing went wrong. Please try again"))
+            })
+        }
     };
 
     const title = challenge.type === "ASSIST" 
@@ -78,7 +147,7 @@ export const Quiz = ({
                             onSelect={onSelect}
                             status={status}
                             selectOption={selectedOption}
-                            disabled={false}
+                            disabled={pending}
                             type={challenge.type}
                         />
                     </div>
@@ -86,9 +155,9 @@ export const Quiz = ({
             </div>
         </div>
         <Footer
-            disabled={!selectedOption}
+            disabled={pending || !selectedOption}
             status={status}
-            onCheck={()=>{}}
+            onCheck={onContinue}
         />
     </>
   )
