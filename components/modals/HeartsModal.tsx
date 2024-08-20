@@ -9,15 +9,15 @@ import {
     DialogHeader,
     DialogTitle
 } from "../ui/dialog"
-import { useExitModal } from "@/store/use-exit-modal"
+import { useHeartsModal } from "@/store/use-hearts-modal"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 
-export const ExitModal = () => {
+export const HeartsModal = () => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const { isOpen, close } = useExitModal()
+    const { isOpen, close } = useHeartsModal()
 
     useEffect(() => setIsClient(true), [])
 
@@ -25,23 +25,27 @@ export const ExitModal = () => {
         return null
     }
 
+    const onClick = () => {
+        close(),
+        router.push("/store")
+    };
+
   return (
     <Dialog open={isOpen} onOpenChange={close}>
         <DialogContent className="max-w-md">
-            <div className="flex items-center w-full justify-center mb-5">
+            <div className="flex items-center w-full justify-center">
                 <Image 
-                    src="/mascot_sad.png"
-                    alt="mascot_sad"
-                    height={80}
-                    width={80}
-                    className="rounded-lg"
+                    src="/mascot_bad.png"
+                    alt="mascot_bad"
+                    height={150}
+                    width={150}
                 />
             </div>
             <DialogTitle className="text-center font-bold text-2xl">
-                Wait, don&apos;t go
+                You ran out of hearts 
             </DialogTitle>
             <DialogDescription className="text-center">
-                You&apos;re about to leave the lesson, Are you sure?
+                Get pro for unlimated hearts or pusrchase them in the store
             </DialogDescription>
             <DialogFooter className="mb-4">
                 <div className="flex flex-col gap-y-4 w-full">
@@ -49,20 +53,17 @@ export const ExitModal = () => {
                         variant="primary" 
                         className="w-full"
                         size="lg"
-                        onClick={close}
+                        onClick={onClick}
                     >
-                        keep learning
+                        Get unlimated hearts
                     </Button>
                     <Button 
-                        variant="dangerOutline" 
+                        variant="primaryOutline" 
                         className="w-full"
                         size="lg"
-                        onClick={()=> {
-                            close();
-                            router.push('/learn')
-                        }}
+                        onClick={close}
                     >
-                        End Session
+                        No thanks
                     </Button>
                 </div>
             </DialogFooter>

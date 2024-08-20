@@ -13,9 +13,11 @@ import { reduceHearts } from "@/actions/user-progress";
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { useAudio, useWindowSize } from "react-use";
+import { useAudio, useMount, useWindowSize } from "react-use";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useHeartsModal } from "@/store/use-hearts-modal";
+import { usePracticeModal } from "@/store/use-practice-modal";
 
 
 
@@ -40,17 +42,29 @@ export const Quiz = ({
     userSubscription,
 }:Props) => {   
 
+    const { open: openHeartModal, } = useHeartsModal();
+    const { open: openPracticeModal, } = usePracticeModal();
+
+    useMount(()=> {
+        if(initialPercentage === 100){
+            openPracticeModal()
+        }
+    });
+    
     const { width, height } = useWindowSize();
+
     const [pending, startTransition] = useTransition();
 
-    const [correctAudio, _c, correctControls] = useAudio({src: "/correct.mp3" })
-    const [incorrecttAudio, _i, incorrecttControls] = useAudio({src: "/incorrect.wav" })
+    const [correctAudio, _c, correctControls] = useAudio({src: "/correct.mp3" });
+    const [incorrecttAudio, _i, incorrecttControls] = useAudio({src: "/incorrect.wav" });
 
-    const [lessonId] = useState(initialLessonId)
-    const router = useRouter()
+    const [lessonId] = useState(initialLessonId);
+
+    const router = useRouter();
 
     const [hearts, setHearts] = useState(initialHearts);
-    const [percentage, setPercentage] = useState(initialPercentage);
+    const [percentage, setPercentage] = useState(()=> initialPercentage === 100 ? 0 : initialPercentage);
+
     const [challenges] = useState(initialLessonChallenges);
     const [activeIndex, setActiveIndex] = useState(()=> {
         const uncompletedIndex = challenges.findIndex(c => !c.completed)
@@ -102,11 +116,13 @@ export const Quiz = ({
                 upserChallengeProgress(challenge.id)
                 .then((res) => {
                     if(res?.error === 'hearts'){
-                        console.log("Missing hearts")
+                        openHeartModal()
                         return
-                    }
+                    };
+
                     setStatus("correct")
                     correctControls.play()
+
                     setPercentage((prev) => prev + 100 / challenges.length)
 
                     if(initialPercentage === 100){
@@ -120,7 +136,7 @@ export const Quiz = ({
                 reduceHearts(challenge.id)
                 .then((res) => {
                     if(res?.error === 'hearts'){
-                        console.log("Missing hearts")
+                        openHeartModal()
                         return
                     }
 
