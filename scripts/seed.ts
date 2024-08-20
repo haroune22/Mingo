@@ -130,7 +130,7 @@ const main = async( ) => {
                 imageSrc: '/women.png',
                 correct: false,
                 text: "la mujer",
-                audioSrc: "/spanish_woman.mp3",
+                audioSrc: "/spanish_women.mp3",
             },
             {
                 challengeId: 1,
@@ -149,7 +149,7 @@ const main = async( ) => {
                 challengeId: 2,
                 correct: false,
                 text: "la mujer",
-                audioSrc: "/spanish_woman.mp3",
+                audioSrc: "/spanish_women.mp3",
             },
             {
                 challengeId: 2,
@@ -169,7 +169,7 @@ const main = async( ) => {
                 imageSrc: '/women.png',
                 correct: false,
                 text: "la mujer",
-                audioSrc: "/spanish_woman.mp3",
+                audioSrc: "/spanish_women.mp3",
             },
             {
                 challengeId: 3,
@@ -179,6 +179,31 @@ const main = async( ) => {
                 audioSrc: "/spanish_robot.mp3",
             },
         ])
+//challenge 2
+        await db.insert(schema.challenges).values([
+            {
+                id:4,
+                lessonId: 2,
+                question: 'wich one of this is the "man" ?',
+                type: "SELECT",
+                order:1,
+            },
+            {
+                id:5,
+                lessonId: 2,
+                question: 'the "man" ?',
+                type: "ASSIST",
+                order:2,
+            },
+            {
+                id:6,
+                lessonId: 2,
+                question: 'wich on of this is the "robot" ?',
+                type: "SELECT",
+                order:3,
+            },
+            
+        ]);
 
         console.log("seeding finished")
     } catch (error) {
