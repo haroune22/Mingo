@@ -8,7 +8,7 @@ import { ResultCard } from "./ResultCard";
 import Confetti from "react-confetti"
 
 import { upserChallengeProgress } from "@/actions/challenge_progress";
-import { challengeOptions, challenges } from "@/db/schema";
+import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 import { reduceHearts } from "@/actions/user-progress";
 
 import { useState, useTransition } from "react";
@@ -30,7 +30,9 @@ type Props = {
         completed: boolean;
         challengeOptions: typeof challengeOptions.$inferSelect[]
     })[];
-    userSubscription: any;
+    userSubscription: typeof userSubscription.$inferSelect & {
+        isActive: boolean;
+    } | null;
 };
 
 

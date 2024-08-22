@@ -1,7 +1,7 @@
 "use server"
 
 import db from "@/db/drizzle"
-import { getCourseById, getUserProgress } from "@/db/queries"
+import { getCourseById, getUserProgress, getUserSubscription } from "@/db/queries"
 import { challengeProgress, challenges, userProgress } from "@/db/schema"
 import { auth, currentUser } from "@clerk/nextjs"
 import { and, eq } from "drizzle-orm"
@@ -25,10 +25,9 @@ export const upserUserProgress = async (courseId: number) => {
         throw new Error("Course not found")
     };
 
-    //create units and lessons for the course
-    // if(!course.units.length || !course.units[0].lessons.length){
-    //     throw new Error("Course is empty")
-    // }
+    if(!course.units.length || !course.units[0].lessons.length){
+        throw new Error("Course is empty")
+    }
 
     const existingUserProgress = await getUserProgress();
     // console.log(existingUserProgress)
@@ -59,7 +58,9 @@ export const upserUserProgress = async (courseId: number) => {
 }
 
 export const reduceHearts = async (challengeId: number) => {
+
     const { userId } = await auth();
+    const userSubscription = await getUserSubscription()
 
     if(!userId){
         throw new Error("unauthorized")
@@ -99,6 +100,10 @@ export const reduceHearts = async (challengeId: number) => {
         return { error: "hearts"}
     };
 
+    if(userSubscription?.isActive){
+        return { error: "subscription"}
+    };
+
     await db.update(userProgress).set({
         hearts: Math.max(currentUserProgress.hearts - 1, 0),
     })
@@ -118,7 +123,7 @@ export const reduceHearts = async (challengeId: number) => {
 export const RefillHearts = async () => {
     
     const { userId } = await auth();
-
+    
     if(!userId){
         throw new Error("unauthorized")
     };

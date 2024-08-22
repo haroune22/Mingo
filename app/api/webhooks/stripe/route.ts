@@ -58,7 +58,8 @@ export async function POST (req: Request) {
             eq(userSubscription.stripeCustomerId, subscription.id)
         );
         
-    }
+    };
+    
     return new NextResponse(null, { status: 200 });    
 
 }
