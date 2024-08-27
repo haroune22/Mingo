@@ -5,6 +5,7 @@ import { getUserProgress, getUserSubscription } from "@/db/queries"
 import Image from "next/image"
 import { redirect } from "next/navigation"
 import { Items } from "./Items"
+import { Quests } from "@/components/quests"
 
 
 const ShopPage = async() => {
@@ -19,7 +20,6 @@ const ShopPage = async() => {
 
   return (
     <div className="flex flex-row-reverse gap-[48px] px-6 ">
-        
         <StickyWrapper>
             <UserProgress
                 activeCourse={userProgress.activeCourse}
@@ -27,6 +27,7 @@ const ShopPage = async() => {
                 points={userProgress.points}
                 hasActiveSubscribtion={!!userSubscription?.isActive}
             />
+            <Quests points={userProgress.points} />
         </StickyWrapper>
         <FeedWrapper>
             <div className="w-full flex flex-col items-center">
